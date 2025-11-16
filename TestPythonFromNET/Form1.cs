@@ -1,4 +1,18 @@
-﻿using AForge.Video;
+﻿/*
+    Form1.cs
+
+    C# Windows Forms application for real-time camera capture and Python integration.
+
+    - Captures video from the first available camera using AForge.NET.
+    - Displays live feed in a PictureBox (liveFeedPixBox) and optionally cropped feed in mainFeedPixBox.
+    - Sends every 5th frame to a Python process (infer.py) via standard input for processing.
+    - Receives JSON results from Python via standard output, including overlay images in base64.
+    - Converts Python overlays to Bitmap and displays them in the main PictureBox.
+    - Logs errors and process info to a TextBox (txtBoxLogs).
+    - Can be extended for real-time anomaly detection, object detection, or image analysis.
+*/
+
+using AForge.Video;
 using AForge.Video.DirectShow;
 using System;
 using System.Diagnostics;
@@ -25,7 +39,6 @@ namespace TestPythonFromNET
             StartPythonProcess();
             InitCamera();
         }
-
 
         private void InitCamera()
         {
@@ -58,10 +71,15 @@ namespace TestPythonFromNET
             });
         }
 
-        private void SendFrameToPython(Bitmap frame)
+        private bool CheckFrameCount()
         {
             FrameCount++;
-            if ((FrameCount % 5) != 0)
+            return (FrameCount % 5) == 0;
+        }
+
+        private void SendFrameToPython(Bitmap frame)
+        {
+            if (!CheckFrameCount())
                 return;
 
             string tempPath = Path.Combine(Path.GetTempPath(), "frame.jpg");
@@ -83,7 +101,6 @@ namespace TestPythonFromNET
                 LogErrorText(ex.ToString());
             }
 
-            LogErrorText("\nsent to python!\n");
             frame.Dispose();       
         }
 
@@ -97,10 +114,10 @@ namespace TestPythonFromNET
 
         private Rectangle GetCropRect(Bitmap frame, PictureBox box)
         {
+            int cropWidth, cropHeight, x , y;
+
             float boxAspect = (float)box.Width / box.Height;
             float frameAspect = (float)frame.Width / frame.Height;
-
-            int cropWidth, cropHeight;
 
             if (frameAspect > boxAspect)
             {
@@ -113,8 +130,8 @@ namespace TestPythonFromNET
                 cropHeight = (int)(frame.Width / boxAspect);
             }
 
-            int x = (frame.Width - cropWidth) / 2;
-            int y = (frame.Height - cropHeight) / 2;
+            x = (frame.Width - cropWidth) / 2;
+            y = (frame.Height - cropHeight) / 2;
 
             return new Rectangle(x, y, cropWidth, cropHeight);
         }
@@ -124,58 +141,74 @@ namespace TestPythonFromNET
             return src.Clone(cropArea, src.PixelFormat);
         }
 
-        private void StartPythonProcess()
+        private void ImageFromPythonCallback(DataReceivedEventArgs e)
         {
-            ProcessStartInfo psi = new ProcessStartInfo
+            var result = JsonSerializer.Deserialize<PythonResult>(e.Data);
+            if (result != null && result.overlay != null)
+            {
+                byte[] bytes = Convert.FromBase64String(result.overlay);
+                using var ms = new MemoryStream(bytes);
+                Bitmap bmp = new Bitmap(ms);
+                mainFeedPixBox.Invoke(() =>
+                {
+                    mainFeedPixBox.Image?.Dispose();
+                    mainFeedPixBox.Image = new Bitmap(bmp);
+                    // lblStatus.Text = $"Status: {result.status} | Score: {result.score:F3}";
+                });
+            }
+        }
+        private ProcessStartInfo CreatePyProcStartInfo()
+        { 
+            return new ProcessStartInfo
             {
                 FileName = "python",
                 Arguments = "infer.py",
                 UseShellExecute = false,
                 RedirectStandardInput = true,
                 RedirectStandardOutput = true,
+                RedirectStandardError = true,
                 CreateNoWindow = true
             };
-
-            pyProcess = Process.Start(psi);
-            Task.Run(() =>
-            {
-                while (true)
-                {
-                    try
-                    {
-                        string line = pyProcess.StandardOutput.ReadLine();
-                        if (string.IsNullOrWhiteSpace(line)) continue;
-                        var result = JsonSerializer.Deserialize<PythonResult>(line);
-                        if (result != null && result.overlay != null)
-                        {
-                            byte[] bytes = Convert.FromBase64String(result.overlay);
-                            using var ms = new MemoryStream(bytes);
-                            Bitmap bmp = new Bitmap(ms);
-                            mainFeedPixBox.Invoke(new Action(() =>
-                            {
-                                mainFeedPixBox.Image?.Dispose();
-                                mainFeedPixBox.Image = new Bitmap(bmp);
-                                //lblStatus.Text = $"Status: {result.status} | Score: {result.score:F3}";
-                            }));
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        LogErrorText(ex.Message);
-                    }
-                }
-            });
         }
+
+        private void StartPythonProcess()
+        {
+            pyProcess = new Process();
+            pyProcess.StartInfo = CreatePyProcStartInfo();
+
+            // Handle python standard output
+            pyProcess.OutputDataReceived += (s, e) =>
+            {
+                if (string.IsNullOrWhiteSpace(e.Data)) return;
+                try
+                {
+                    ImageFromPythonCallback(e);
+                }
+                catch
+                {
+                    LogErrorText("[PY OUT] " + e.Data);
+                }
+            };
+
+            // Handle python standard error
+            pyProcess.ErrorDataReceived += (s, e) =>
+            {
+                if (!string.IsNullOrWhiteSpace(e.Data))
+                {
+                    LogErrorText("[PY ERR] " + e.Data);
+                }
+            };
+
+            // Start the python process
+            pyProcess.Start();
+            pyProcess.BeginOutputReadLine();
+            pyProcess.BeginErrorReadLine();
+        }
+
         private void btnRunPyScript_Click(object sender, EventArgs e)
         {
             MessageBox.Show("running!");
         }
-    }
-    public class PythonResult
-    {
-        public string status { get; set; }
-        public double score { get; set; }
-        public string overlay { get; set; }
     }
 
 }
