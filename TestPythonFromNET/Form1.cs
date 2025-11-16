@@ -1,18 +1,20 @@
+﻿using AForge.Video;
+using AForge.Video.DirectShow;
 using System;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.Drawing;
 using System.IO;
 using System.Text.Json;
 using System.Windows.Forms;
-using AForge.Video;
-using AForge.Video.DirectShow;
 
 namespace TestPythonFromNET
 {
-  
+
     public partial class Form1 : Form
     {
         private bool IsRunning = false;
+        private int FrameCount = 0;
         private Process pyProcess;
         private FilterInfoCollection videoDevices;
         private VideoCaptureDevice videoSource;
@@ -20,6 +22,7 @@ namespace TestPythonFromNET
         public Form1()
         {
             InitializeComponent();
+            StartPythonProcess();
             InitCamera();
         }
 
@@ -35,29 +38,91 @@ namespace TestPythonFromNET
             videoSource.Start();
         }
 
-        private void VideoSource_NewFrame(object sender, NewFrameEventArgs eventArgs)
+        private void UpdateLiveFeedImg(Bitmap frame)
         {
-            Bitmap frame = (Bitmap)eventArgs.Frame.Clone();
-
             liveFeedPixBox.Invoke(new Action(() =>
             {
                 var old = liveFeedPixBox.Image;
                 liveFeedPixBox.Image = (Bitmap)frame.Clone();
                 old?.Dispose();
             }));
-
-            // Save current frame to temp file to send to Python
-            string tempPath = Path.Combine(Path.GetTempPath(), "frame.jpg");
-            frame.Save(tempPath);
-            if (pyProcess != null)
-            {
-                pyProcess.StandardInput.WriteLine(tempPath);
-                pyProcess.StandardInput.Flush();
-            }
-
-            frame.Dispose(); // Dispose the clone we made
         }
 
+        private void LogErrorText(string txt)
+        {
+            txtBoxLogs.Invoke(() =>
+            {
+                txtBoxLogs.Text += txt + "\n";
+                txtBoxLogs.SelectionStart = txtBoxLogs.Text.Length;
+                txtBoxLogs.ScrollToCaret();
+            });
+        }
+
+        private void SendFrameToPython(Bitmap frame)
+        {
+            FrameCount++;
+            if ((FrameCount % 5) != 0)
+                return;
+
+            string tempPath = Path.Combine(Path.GetTempPath(), "frame.jpg");
+            frame.Save(tempPath);
+            try
+            {
+                if (pyProcess != null && !pyProcess.HasExited)
+                {
+                    pyProcess.StandardInput.WriteLine(tempPath);
+                    pyProcess.StandardInput.Flush();
+                }
+                else if (pyProcess == null)
+                {
+                    LogErrorText("py process in null!");
+                }
+            }
+            catch (Exception ex)
+            {
+                LogErrorText(ex.ToString());
+            }
+
+            LogErrorText("\nsent to python!\n");
+            frame.Dispose();       
+        }
+
+        private void VideoSource_NewFrame(object sender, NewFrameEventArgs eventArgs)
+        {
+            Bitmap frame = (Bitmap)eventArgs.Frame.Clone();
+            frame = CropBitmap(frame, GetCropRect(frame, mainFeedPixBox));
+            UpdateLiveFeedImg(frame);
+            SendFrameToPython(frame);
+        }
+
+        private Rectangle GetCropRect(Bitmap frame, PictureBox box)
+        {
+            float boxAspect = (float)box.Width / box.Height;
+            float frameAspect = (float)frame.Width / frame.Height;
+
+            int cropWidth, cropHeight;
+
+            if (frameAspect > boxAspect)
+            {
+                cropHeight = frame.Height;
+                cropWidth = (int)(frame.Height * boxAspect);
+            }
+            else
+            {
+                cropWidth = frame.Width;
+                cropHeight = (int)(frame.Width / boxAspect);
+            }
+
+            int x = (frame.Width - cropWidth) / 2;
+            int y = (frame.Height - cropHeight) / 2;
+
+            return new Rectangle(x, y, cropWidth, cropHeight);
+        }
+
+        private Bitmap CropBitmap(Bitmap src, Rectangle cropArea)
+        {
+            return src.Clone(cropArea, src.PixelFormat);
+        }
 
         private void StartPythonProcess()
         {
@@ -72,43 +137,38 @@ namespace TestPythonFromNET
             };
 
             pyProcess = Process.Start(psi);
-
             Task.Run(() =>
             {
-                while (!pyProcess.StandardOutput.EndOfStream)
+                while (true)
                 {
-                    string line = pyProcess.StandardOutput.ReadLine();
-                    if (string.IsNullOrWhiteSpace(line)) continue;
-
-                    var result = JsonSerializer.Deserialize<PythonResult>(line);
-                    if (result.overlay != null)
+                    try
                     {
-                        byte[] bytes = Convert.FromBase64String(result.overlay);
-                        using var ms = new MemoryStream(bytes);
-                        Bitmap bmp = new Bitmap(ms);
-
-                        // Update PictureBox in UI thread
-                        mainFeedPixBox.Invoke(new Action(() =>
+                        string line = pyProcess.StandardOutput.ReadLine();
+                        if (string.IsNullOrWhiteSpace(line)) continue;
+                        var result = JsonSerializer.Deserialize<PythonResult>(line);
+                        if (result != null && result.overlay != null)
                         {
-                            mainFeedPixBox.Image?.Dispose();
-                            mainFeedPixBox.Image = new Bitmap(bmp);
-                            //lblStatus.Text = $"Status: {result.status} | Score: {result.score:F3}";
-                        }));
+                            byte[] bytes = Convert.FromBase64String(result.overlay);
+                            using var ms = new MemoryStream(bytes);
+                            Bitmap bmp = new Bitmap(ms);
+                            mainFeedPixBox.Invoke(new Action(() =>
+                            {
+                                mainFeedPixBox.Image?.Dispose();
+                                mainFeedPixBox.Image = new Bitmap(bmp);
+                                //lblStatus.Text = $"Status: {result.status} | Score: {result.score:F3}";
+                            }));
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        LogErrorText(ex.Message);
                     }
                 }
             });
         }
         private void btnRunPyScript_Click(object sender, EventArgs e)
         {
-            if (!IsRunning)
-            {
-                StartPythonProcess();
-                IsRunning = true;
-            }
-            else
-            {
-                MessageBox.Show("running!");
-            }
+            MessageBox.Show("running!");
         }
     }
     public class PythonResult
