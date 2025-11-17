@@ -38,6 +38,24 @@ namespace TestPythonFromNET
             InitializeComponent();
             StartPythonProcess();
             InitCamera();
+            this.FormClosing += Form1_FormClosing;
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            // Stop your Python process if it's running
+            if (pyProcess != null && !pyProcess.HasExited)
+            {
+                try
+                {
+                    pyProcess.Kill();
+                    pyProcess.WaitForExit();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error stopping Python process: " + ex.Message);
+                }
+            }
         }
 
         private void InitCamera()
@@ -162,7 +180,7 @@ namespace TestPythonFromNET
             return new ProcessStartInfo
             {
                 FileName = "python",
-                Arguments = "infer.py",
+                Arguments = "infer_anomalib.py",
                 UseShellExecute = false,
                 RedirectStandardInput = true,
                 RedirectStandardOutput = true,
