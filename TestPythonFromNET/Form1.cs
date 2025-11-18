@@ -202,33 +202,39 @@ namespace TestPythonFromNET
             };
         }
 
+        private void PyOutputRecvCallback(object s, DataReceivedEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(e.Data)) 
+                return;
+            
+            try
+            {
+                ImageFromPythonCallback(e);
+            }
+            catch
+            {
+                LogErrorText("[PY OUT] " + e.Data);
+            }
+        }
+
+        private void PyErrorOutCallback(object s, DataReceivedEventArgs e)
+        {
+            if (!string.IsNullOrWhiteSpace(e.Data))
+            {
+                LogErrorText("[PY ERR] " + e.Data);
+            }
+        }
+
         private void StartPythonProcess()
         {
             pyProcess = new Process();
             pyProcess.StartInfo = CreatePyProcStartInfo();
 
             // Handle python standard output
-            pyProcess.OutputDataReceived += (s, e) =>
-            {
-                if (string.IsNullOrWhiteSpace(e.Data)) return;
-                try
-                {
-                    ImageFromPythonCallback(e);
-                }
-                catch
-                {
-                    LogErrorText("[PY OUT] " + e.Data);
-                }
-            };
+            pyProcess.OutputDataReceived += PyOutputRecvCallback;
 
             // Handle python standard error
-            pyProcess.ErrorDataReceived += (s, e) =>
-            {
-                if (!string.IsNullOrWhiteSpace(e.Data))
-                {
-                    LogErrorText("[PY ERR] " + e.Data);
-                }
-            };
+            pyProcess.ErrorDataReceived += PyErrorOutCallback;
 
             // Start the python process
             pyProcess.Start();
