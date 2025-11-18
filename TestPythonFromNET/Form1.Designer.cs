@@ -31,15 +31,19 @@
             btnRunPyScript = new Button();
             mainFeedPixBox = new PictureBox();
             liveFeedPixBox = new PictureBox();
-            groupBox1 = new GroupBox();
+            s = new GroupBox();
             groupBox2 = new GroupBox();
+            boxRawOutAutoScroll = new CheckBox();
+            label1 = new Label();
             txtBoxLogs = new RichTextBox();
             txtBoxRecentStatus = new RichTextBox();
-            label1 = new Label();
             label2 = new Label();
             groupBox3 = new GroupBox();
+            boxPyOutAutoScroll = new CheckBox();
+            checkBox1 = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)mainFeedPixBox).BeginInit();
             ((System.ComponentModel.ISupportInitialize)liveFeedPixBox).BeginInit();
+            s.SuspendLayout();
             groupBox2.SuspendLayout();
             groupBox3.SuspendLayout();
             SuspendLayout();
@@ -70,17 +74,19 @@
             liveFeedPixBox.TabIndex = 2;
             liveFeedPixBox.TabStop = false;
             // 
-            // groupBox1
+            // s
             // 
-            groupBox1.Location = new Point(421, 12);
-            groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(963, 762);
-            groupBox1.TabIndex = 3;
-            groupBox1.TabStop = false;
-            groupBox1.Text = "CAM Feed";
+            s.Controls.Add(checkBox1);
+            s.Location = new Point(421, 12);
+            s.Name = "s";
+            s.Size = new Size(963, 762);
+            s.TabIndex = 3;
+            s.TabStop = false;
+            s.Text = "CAM Feed";
             // 
             // groupBox2
             // 
+            groupBox2.Controls.Add(boxRawOutAutoScroll);
             groupBox2.Controls.Add(label1);
             groupBox2.Controls.Add(txtBoxLogs);
             groupBox2.Location = new Point(12, 12);
@@ -90,11 +96,30 @@
             groupBox2.TabStop = false;
             groupBox2.Text = "Controls";
             // 
+            // boxRawOutAutoScroll
+            // 
+            boxRawOutAutoScroll.AutoSize = true;
+            boxRawOutAutoScroll.Location = new Point(122, 697);
+            boxRawOutAutoScroll.Name = "boxRawOutAutoScroll";
+            boxRawOutAutoScroll.Size = new Size(125, 29);
+            boxRawOutAutoScroll.TabIndex = 2;
+            boxRawOutAutoScroll.Text = "Auto Scroll";
+            boxRawOutAutoScroll.UseVisualStyleBackColor = true;
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(23, 199);
+            label1.Name = "label1";
+            label1.Size = new Size(131, 25);
+            label1.TabIndex = 1;
+            label1.Text = "Raw Py Output";
+            // 
             // txtBoxLogs
             // 
             txtBoxLogs.Location = new Point(23, 237);
             txtBoxLogs.Name = "txtBoxLogs";
-            txtBoxLogs.Size = new Size(360, 481);
+            txtBoxLogs.Size = new Size(360, 434);
             txtBoxLogs.TabIndex = 0;
             txtBoxLogs.Text = "";
             // 
@@ -102,18 +127,9 @@
             // 
             txtBoxRecentStatus.Location = new Point(1415, 92);
             txtBoxRecentStatus.Name = "txtBoxRecentStatus";
-            txtBoxRecentStatus.Size = new Size(360, 660);
+            txtBoxRecentStatus.Size = new Size(360, 591);
             txtBoxRecentStatus.TabIndex = 1;
             txtBoxRecentStatus.Text = "";
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Location = new Point(23, 209);
-            label1.Name = "label1";
-            label1.Size = new Size(131, 25);
-            label1.TabIndex = 1;
-            label1.Text = "Raw Py Output";
             // 
             // label2
             // 
@@ -126,13 +142,34 @@
             // 
             // groupBox3
             // 
+            groupBox3.Controls.Add(boxPyOutAutoScroll);
             groupBox3.Controls.Add(label2);
-            groupBox3.Location = new Point(1390, 27);
+            groupBox3.Location = new Point(1390, 12);
             groupBox3.Name = "groupBox3";
-            groupBox3.Size = new Size(409, 747);
+            groupBox3.Size = new Size(409, 762);
             groupBox3.TabIndex = 5;
             groupBox3.TabStop = false;
             groupBox3.Text = "Anomaly Detection";
+            // 
+            // boxPyOutAutoScroll
+            // 
+            boxPyOutAutoScroll.AutoSize = true;
+            boxPyOutAutoScroll.Location = new Point(155, 682);
+            boxPyOutAutoScroll.Name = "boxPyOutAutoScroll";
+            boxPyOutAutoScroll.Size = new Size(125, 29);
+            boxPyOutAutoScroll.TabIndex = 3;
+            boxPyOutAutoScroll.Text = "Auto Scroll";
+            boxPyOutAutoScroll.UseVisualStyleBackColor = true;
+            // 
+            // checkBox1
+            // 
+            checkBox1.AutoSize = true;
+            checkBox1.Location = new Point(932, 432);
+            checkBox1.Name = "checkBox1";
+            checkBox1.Size = new Size(121, 29);
+            checkBox1.TabIndex = 0;
+            checkBox1.Text = "checkBox1";
+            checkBox1.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
@@ -143,13 +180,15 @@
             Controls.Add(liveFeedPixBox);
             Controls.Add(mainFeedPixBox);
             Controls.Add(btnRunPyScript);
-            Controls.Add(groupBox1);
+            Controls.Add(s);
             Controls.Add(groupBox2);
             Controls.Add(groupBox3);
             Name = "Form1";
             Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)mainFeedPixBox).EndInit();
             ((System.ComponentModel.ISupportInitialize)liveFeedPixBox).EndInit();
+            s.ResumeLayout(false);
+            s.PerformLayout();
             groupBox2.ResumeLayout(false);
             groupBox2.PerformLayout();
             groupBox3.ResumeLayout(false);
@@ -162,12 +201,15 @@
         private Button btnRunPyScript;
         private PictureBox mainFeedPixBox;
         private PictureBox liveFeedPixBox;
-        private GroupBox groupBox1;
+        private GroupBox s;
         private GroupBox groupBox2;
         private RichTextBox txtBoxLogs;
         private RichTextBox txtBoxRecentStatus;
         private Label label1;
         private Label label2;
         private GroupBox groupBox3;
+        private CheckBox boxRawOutAutoScroll;
+        private CheckBox boxPyOutAutoScroll;
+        private CheckBox checkBox1;
     }
 }

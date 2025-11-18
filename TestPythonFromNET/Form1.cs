@@ -88,7 +88,8 @@ namespace TestPythonFromNET
             {
                 txtBoxLogs.Text += txt + "\n";
                 txtBoxLogs.SelectionStart = txtBoxLogs.Text.Length;
-                txtBoxLogs.ScrollToCaret();
+                if (boxRawOutAutoScroll.Checked)
+                    txtBoxLogs.ScrollToCaret();
             });
         }
 
@@ -98,7 +99,8 @@ namespace TestPythonFromNET
             {
                 txtBoxRecentStatus.Text += txt + "\n";
                 txtBoxRecentStatus.SelectionStart = txtBoxRecentStatus.Text.Length;
-                txtBoxRecentStatus.ScrollToCaret();
+                if (boxPyOutAutoScroll.Checked)
+                    txtBoxRecentStatus.ScrollToCaret();
             });
         }
 
