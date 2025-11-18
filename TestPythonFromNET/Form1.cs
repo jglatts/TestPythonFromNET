@@ -19,6 +19,7 @@ using System.Diagnostics;
 using System.Diagnostics.Tracing;
 using System.Drawing;
 using System.IO;
+using System.Numerics;
 using System.Text.Json;
 using System.Windows.Forms;
 
@@ -32,7 +33,7 @@ namespace TestPythonFromNET
         private Process pyProcess;
         private FilterInfoCollection videoDevices;
         private VideoCaptureDevice videoSource;
-
+        private long numPyFrames = 1;
         public Form1()
         {
             InitializeComponent();
@@ -86,7 +87,7 @@ namespace TestPythonFromNET
             {
                 txtBoxLogs.Text += txt + "\n";
                 txtBoxLogs.SelectionStart = txtBoxLogs.Text.Length;
-                //txtBoxLogs.ScrollToCaret();
+                txtBoxLogs.ScrollToCaret();
             });
         }
 
@@ -96,7 +97,7 @@ namespace TestPythonFromNET
             {
                 txtBoxRecentStatus.Text += txt + "\n";
                 txtBoxRecentStatus.SelectionStart = txtBoxRecentStatus.Text.Length;
-                //txtBoxLogs.ScrollToCaret();
+                txtBoxRecentStatus.ScrollToCaret();
             });
         }
 
@@ -182,7 +183,7 @@ namespace TestPythonFromNET
                 {
                     mainFeedPixBox.Image?.Dispose();
                     mainFeedPixBox.Image = new Bitmap(bmp);
-                    LogPyData($"Status: {result.status} | Score: {result.score:F3}");
+                    LogPyData($"Status: {result.status} | Score: {result.score:F3} | Frame: {numPyFrames++}");
                 });
             }
         }
