@@ -28,12 +28,10 @@ namespace TestPythonFromNET
 
     public partial class Form1 : Form
     {
-        private bool IsRunning = false;
-        private int FrameCount = 0;
         private Process pyProcess;
-        private FilterInfoCollection videoDevices;
-        private VideoCaptureDevice videoSource;
+        private int FrameCount = 0;
         private long numPyFrames = 1;
+
         public Form1()
         {
             InitializeComponent();
@@ -61,6 +59,9 @@ namespace TestPythonFromNET
 
         private void InitCamera()
         {
+            VideoCaptureDevice videoSource;
+            FilterInfoCollection videoDevices;
+            
             videoDevices = new FilterInfoCollection(FilterCategory.VideoInputDevice);
             if (videoDevices.Count == 0)
                 throw new ApplicationException("No camera found.");
