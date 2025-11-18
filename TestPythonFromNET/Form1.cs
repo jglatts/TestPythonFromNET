@@ -64,7 +64,8 @@ namespace TestPythonFromNET
             if (videoDevices.Count == 0)
                 throw new ApplicationException("No camera found.");
 
-            videoSource = new VideoCaptureDevice(videoDevices[0].MonikerString);
+            int dev_idx = videoDevices.Count > 1 ? 1 : 0;
+            videoSource = new VideoCaptureDevice(videoDevices[dev_idx].MonikerString);
             videoSource.NewFrame += VideoSource_NewFrame;
             videoSource.Start();
         }
@@ -85,7 +86,17 @@ namespace TestPythonFromNET
             {
                 txtBoxLogs.Text += txt + "\n";
                 txtBoxLogs.SelectionStart = txtBoxLogs.Text.Length;
-                txtBoxLogs.ScrollToCaret();
+                //txtBoxLogs.ScrollToCaret();
+            });
+        }
+
+        private void LogPyData(string txt)
+        {
+            txtBoxRecentStatus.Invoke(() =>
+            {
+                txtBoxRecentStatus.Text += txt + "\n";
+                txtBoxRecentStatus.SelectionStart = txtBoxRecentStatus.Text.Length;
+                //txtBoxLogs.ScrollToCaret();
             });
         }
 
@@ -133,7 +144,7 @@ namespace TestPythonFromNET
         private Rectangle GetCropRect(Bitmap frame, PictureBox box)
         {
             int cropWidth, cropHeight, x , y;
-
+            
             float boxAspect = (float)box.Width / box.Height;
             float frameAspect = (float)frame.Width / frame.Height;
 
@@ -171,10 +182,11 @@ namespace TestPythonFromNET
                 {
                     mainFeedPixBox.Image?.Dispose();
                     mainFeedPixBox.Image = new Bitmap(bmp);
-                    // lblStatus.Text = $"Status: {result.status} | Score: {result.score:F3}";
+                    LogPyData($"Status: {result.status} | Score: {result.score:F3}");
                 });
             }
         }
+
         private ProcessStartInfo CreatePyProcStartInfo()
         { 
             return new ProcessStartInfo

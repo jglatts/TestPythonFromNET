@@ -23,6 +23,8 @@ MIN_RADIUS = 3
 
 CKPT_PATH = "model.ckpt"
 
+model = Patchcore()
+engine = Engine()
 
 def encode_image(img):
     _, buffer = cv2.imencode(".jpg", img)
@@ -61,9 +63,6 @@ def predict_frame(frame):
     """
     Run Patchcore on a single OpenCV BGR frame.
     """
-    model = Patchcore()
-    engine = Engine()
-
     # Save frame temporarily for PredictDataset
     temp_file = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
     cv2.imwrite(temp_file.name, frame)

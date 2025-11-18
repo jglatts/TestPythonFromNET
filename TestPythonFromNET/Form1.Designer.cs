@@ -34,9 +34,14 @@
             groupBox1 = new GroupBox();
             groupBox2 = new GroupBox();
             txtBoxLogs = new RichTextBox();
+            txtBoxRecentStatus = new RichTextBox();
+            label1 = new Label();
+            label2 = new Label();
+            groupBox3 = new GroupBox();
             ((System.ComponentModel.ISupportInitialize)mainFeedPixBox).BeginInit();
             ((System.ComponentModel.ISupportInitialize)liveFeedPixBox).BeginInit();
             groupBox2.SuspendLayout();
+            groupBox3.SuspendLayout();
             SuspendLayout();
             // 
             // btnRunPyScript
@@ -76,6 +81,7 @@
             // 
             // groupBox2
             // 
+            groupBox2.Controls.Add(label1);
             groupBox2.Controls.Add(txtBoxLogs);
             groupBox2.Location = new Point(12, 12);
             groupBox2.Name = "groupBox2";
@@ -86,27 +92,68 @@
             // 
             // txtBoxLogs
             // 
-            txtBoxLogs.Location = new Point(23, 214);
+            txtBoxLogs.Location = new Point(23, 237);
             txtBoxLogs.Name = "txtBoxLogs";
-            txtBoxLogs.Size = new Size(360, 504);
+            txtBoxLogs.Size = new Size(360, 481);
             txtBoxLogs.TabIndex = 0;
             txtBoxLogs.Text = "";
+            // 
+            // txtBoxRecentStatus
+            // 
+            txtBoxRecentStatus.Location = new Point(1415, 92);
+            txtBoxRecentStatus.Name = "txtBoxRecentStatus";
+            txtBoxRecentStatus.Size = new Size(360, 660);
+            txtBoxRecentStatus.TabIndex = 1;
+            txtBoxRecentStatus.Text = "";
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(23, 209);
+            label1.Name = "label1";
+            label1.Size = new Size(131, 25);
+            label1.TabIndex = 1;
+            label1.Text = "Raw Py Output";
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new Point(25, 37);
+            label2.Name = "label2";
+            label2.Size = new Size(141, 25);
+            label2.TabIndex = 2;
+            label2.Text = "Detection Status";
+            // 
+            // groupBox3
+            // 
+            groupBox3.Controls.Add(label2);
+            groupBox3.Location = new Point(1390, 27);
+            groupBox3.Name = "groupBox3";
+            groupBox3.Size = new Size(409, 747);
+            groupBox3.TabIndex = 5;
+            groupBox3.TabStop = false;
+            groupBox3.Text = "Anomaly Detection";
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1410, 799);
+            ClientSize = new Size(1811, 799);
+            Controls.Add(txtBoxRecentStatus);
             Controls.Add(liveFeedPixBox);
             Controls.Add(mainFeedPixBox);
             Controls.Add(btnRunPyScript);
             Controls.Add(groupBox1);
             Controls.Add(groupBox2);
+            Controls.Add(groupBox3);
             Name = "Form1";
             Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)mainFeedPixBox).EndInit();
             ((System.ComponentModel.ISupportInitialize)liveFeedPixBox).EndInit();
             groupBox2.ResumeLayout(false);
+            groupBox2.PerformLayout();
+            groupBox3.ResumeLayout(false);
+            groupBox3.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -118,5 +165,9 @@
         private GroupBox groupBox1;
         private GroupBox groupBox2;
         private RichTextBox txtBoxLogs;
+        private RichTextBox txtBoxRecentStatus;
+        private Label label1;
+        private Label label2;
+        private GroupBox groupBox3;
     }
 }
