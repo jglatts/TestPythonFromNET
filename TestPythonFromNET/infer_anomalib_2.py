@@ -19,6 +19,8 @@ THRESHOLD = 0.5
 MIN_RADIUS = 3
 INPUT_SIZE = (512, 512)
 
+ran_from_shell = False
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model = Patchcore.load_from_checkpoint(CKPT_PATH)
 model.eval()
@@ -80,8 +82,11 @@ def analyze_prediction(anomaly_map: np.ndarray, frame: np.ndarray):
 def process_frame(frame: np.ndarray) -> dict:
     anomaly_map = predict_frame(frame)
     status, score, overlay = analyze_prediction(anomaly_map, frame)
-    return {"status": status, "score": score, "overlay": encode_image(overlay)}
+    out = { "status": status, "score": score }
+    if not ran_from_shell:
+        out["overlay"] = encode_image(overlay)
 
+    return out    
 
 def main():
     print("Anomalib C# interface running (real-time, in-memory)", flush=True)
@@ -103,4 +108,7 @@ def main():
 
 
 if __name__ == "__main__":
+    if (len(sys.argv) > 1):
+        ran_from_shell = True
+
     main()
