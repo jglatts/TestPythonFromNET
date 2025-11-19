@@ -1,9 +1,35 @@
-'''
-        Script to train and test a model on MVTecAD dataset
+﻿"""
+=====================================================================
+Anomalib Training Script for MVTecAD and Custom Folder Datasets
+=====================================================================
 
-        NOTE:
-            This script must be run in admin terminal to avoid permission issues
-'''
+Overview:
+    This script provides a simple wrapper for training and testing
+    anomaly-detection models using Anomalib. It supports both:
+        • Custom folder-based datasets (normal/abnormal directory structure)
+        • Full MVTecAD-formatted datasets
+
+    The CreateEngine class encapsulates dataset construction, model
+    initialization (PatchCore), and execution of training/testing cycles.
+
+Features:
+    • Auto train/test split for folder datasets
+    • MVTecAD-compliant datamodule option
+    • PatchCore model with configurable nearest-neighbor count
+    • Standardized Engine lifecycle (fit → test)
+
+Notes:
+    • For Windows users: run this script from an elevated(Admin) terminal
+      to avoid permission issues when Anomalib writes logs/checkpoints.
+    • Folder datasets must follow "normal_dir / abnormal_dir" structure.
+    • MVTecAD datasets must follow official directory conventions (see docs).
+
+Author:
+    John Glatts
+    Z-Axis Connector Company
+    Date: 11/19/2025
+
+"""
 from anomalib.data import MVTecAD
 from anomalib.data import Folder
 from anomalib.engine import Engine
@@ -39,6 +65,7 @@ class CreateEngine:
     # NOTE
     #   datasets must follow MVTecAD structure
     def createEngineMVTecAD(self):
+        # Create dataset
         datamodule = MVTecAD(
             root=self.dataset_root,
             category=self.category_name + "_datset",
