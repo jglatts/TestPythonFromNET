@@ -23,6 +23,8 @@ Notes:
       to avoid permission issues when Anomalib writes logs/checkpoints.
     • Folder datasets must follow "normal_dir / abnormal_dir" structure.
     • MVTecAD datasets must follow official directory conventions (see docs).
+    • Should train model with images it will see in field.
+
 
 Author:
     John Glatts

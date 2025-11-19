@@ -3,11 +3,11 @@ anomalib_infer.py
 
 Minimal Python script to integrate Anomalib Patchcore with a C# frontend.
 
+
 - Reads image paths from stdin.
 - Runs Patchcore anomaly detection.
 - Returns JSON with status, score, and overlay image (base64).
 """
-
 import sys
 import json
 import cv2
@@ -20,8 +20,6 @@ from anomalib.models import Patchcore
 
 IMAGE_SCORE_THRESHOLD = 0.5
 MIN_RADIUS = 3
-
-CKPT_PATH = "model.ckpt"
 
 model = Patchcore()
 engine = Engine()
@@ -68,7 +66,8 @@ def predict_frame(frame):
     cv2.imwrite(temp_file.name, frame)
     
     dataset = PredictDataset(path=temp_file.name, image_size=(512, 512))
-    predictions = engine.predict(model=model, dataset=dataset, ckpt_path=CKPT_PATH)
+    predictions = engine.predict(model=model, dataset=dataset, 
+                                 ckpt_path=CKPT_PATH, return_predictions=False)
     
     temp_file.close()
     
@@ -106,5 +105,5 @@ def main():
         print(json.dumps(output), flush=True)
 
 
-
-main()
+if __name__ == "__main__":
+    main()

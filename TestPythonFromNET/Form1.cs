@@ -76,7 +76,7 @@ namespace TestPythonFromNET
         {
             liveFeedPixBox.Invoke(new Action(() =>
             {
-                var old = liveFeedPixBox.Image;
+                Image old = liveFeedPixBox.Image;
                 liveFeedPixBox.Image = (Bitmap)frame.Clone();
                 old?.Dispose();
             }));
@@ -196,7 +196,7 @@ namespace TestPythonFromNET
             return new ProcessStartInfo
             {
                 FileName = "python",
-                Arguments = "infer_anomalib.py",
+                Arguments = "infer_anomalib_2.py",
                 UseShellExecute = false,
                 RedirectStandardInput = true,
                 RedirectStandardOutput = true,

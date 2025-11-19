@@ -40,10 +40,8 @@
             label2 = new Label();
             groupBox3 = new GroupBox();
             boxPyOutAutoScroll = new CheckBox();
-            checkBox1 = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)mainFeedPixBox).BeginInit();
             ((System.ComponentModel.ISupportInitialize)liveFeedPixBox).BeginInit();
-            s.SuspendLayout();
             groupBox2.SuspendLayout();
             groupBox3.SuspendLayout();
             SuspendLayout();
@@ -76,7 +74,6 @@
             // 
             // s
             // 
-            s.Controls.Add(checkBox1);
             s.Location = new Point(421, 12);
             s.Name = "s";
             s.Size = new Size(963, 762);
@@ -161,16 +158,6 @@
             boxPyOutAutoScroll.Text = "Auto Scroll";
             boxPyOutAutoScroll.UseVisualStyleBackColor = true;
             // 
-            // checkBox1
-            // 
-            checkBox1.AutoSize = true;
-            checkBox1.Location = new Point(932, 432);
-            checkBox1.Name = "checkBox1";
-            checkBox1.Size = new Size(121, 29);
-            checkBox1.TabIndex = 0;
-            checkBox1.Text = "checkBox1";
-            checkBox1.UseVisualStyleBackColor = true;
-            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
@@ -187,8 +174,6 @@
             Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)mainFeedPixBox).EndInit();
             ((System.ComponentModel.ISupportInitialize)liveFeedPixBox).EndInit();
-            s.ResumeLayout(false);
-            s.PerformLayout();
             groupBox2.ResumeLayout(false);
             groupBox2.PerformLayout();
             groupBox3.ResumeLayout(false);
@@ -210,6 +195,5 @@
         private GroupBox groupBox3;
         private CheckBox boxRawOutAutoScroll;
         private CheckBox boxPyOutAutoScroll;
-        private CheckBox checkBox1;
     }
 }
