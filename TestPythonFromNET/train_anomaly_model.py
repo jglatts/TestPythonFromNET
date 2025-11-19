@@ -37,7 +37,8 @@ from anomalib.models import Patchcore
 
 
 class CreateEngine:
-    def __init__(self, dataset_root="", category_name="", normal_dir="", bad_dir=""):
+    def __init__(self, dataset_root="", category_name="", 
+                 normal_dir="", bad_dir=""):
         self.dataset_root = dataset_root
         self.category_name = category_name
         self.normal_dir = normal_dir
@@ -45,13 +46,20 @@ class CreateEngine:
         self.engine = None
         self.model = None
         self.datamodule = None
+        self.is_created = False
 
     def trainEngine(self):
+        if not self.is_created:
+            return
+
         print("\n\n🚀 Starting Training... 🚀\n\n")
         self.engine.fit(datamodule=self.datamodule, model=self.model)
         print("\n\n🚀 Training Complete... 🚀\n\n")
 
     def testEngine(self):
+        if not self.is_created:
+            return
+        
         print("\n\n🚀 Starting Testing... 🚀\n\n")
         self.engine.test(datamodule=self.datamodule, model=self.model)
         print("\n\n🚀 Testing Complete... 🚀\n\n")
@@ -67,6 +75,7 @@ class CreateEngine:
 
         self.model = Patchcore(num_neighbors=6)
         self.engine = Engine(max_epochs=10)          # for smaller dataset, use more epochs
+        self.is_created = True
 
         # Train
         self.trainEngine()
@@ -88,6 +97,7 @@ class CreateEngine:
         # Initialize model and engine
         self.model = Patchcore(num_neighbors=6)
         self.engine = Engine(max_epochs=5)
+        self.is_created = True
 
         # Train
         self.trainEngine()
