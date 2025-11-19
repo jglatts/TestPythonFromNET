@@ -42,9 +42,22 @@ class CreateEngine:
         self.category_name = category_name
         self.normal_dir = normal_dir
         self.bad_dir = bad_dir
+        self.engine = None
+        self.model = None
+        self.datamodule = None
+
+    def trainEngine(self):
+        print("\n\n🚀 Starting Training... 🚀\n\n")
+        self.engine.fit(datamodule=self.datamodule, model=self.model)
+        print("\n\n🚀 Training Complete... 🚀\n\n")
+
+    def testEngine(self):
+        print("\n\n🚀 Starting Testing... 🚀\n\n")
+        self.engine.test(datamodule=self.datamodule, model=self.model)
+        print("\n\n🚀 Testing Complete... 🚀\n\n")
 
     def createEngineSimple(self):
-        datamodule = Folder(
+        self.datamodule = Folder(
             name=self.category_name + "_dataset",
             root=self.dataset_root,
             normal_dir=self.normal_dir,       # where the normal samples are
@@ -52,45 +65,44 @@ class CreateEngine:
             normal_split_ratio=0.8,           # auto split
         )
 
-        model = Patchcore(num_neighbors=6)
-        engine = Engine(max_epochs=10)          # for smaller dataset, use more epochs
+        self.model = Patchcore(num_neighbors=6)
+        self.engine = Engine(max_epochs=10)          # for smaller dataset, use more epochs
 
         # Train
-        engine.fit(datamodule=datamodule, model=model)
-        
-        # Test
-        engine.test(datamodule=datamodule, model=model)
+        self.trainEngine()
 
+        # Test
+        self.testEngine()
 
     # NOTE
     #   datasets must follow MVTecAD structure
     def createEngineMVTecAD(self):
         # Create dataset
-        datamodule = MVTecAD(
+        self.datamodule = MVTecAD(
             root=self.dataset_root,
             category=self.category_name + "_datset",
             train_batch_size=8,
             eval_batch_size=8,
         )
-
+        
         # Initialize model and engine
-        model = Patchcore(num_neighbors=6)
-        engine = Engine(max_epochs=5)
+        self.model = Patchcore(num_neighbors=6)
+        self.engine = Engine(max_epochs=5)
 
         # Train
-        engine.fit(datamodule=datamodule, model=model)
-        
-        # Test
-        engine.test(datamodule=datamodule, model=model)
+        self.trainEngine()
 
+        # Test
+        self.testEngine()
 
 
 if __name__ == "__main__":
     # NOTE
     #   normal and bad directories are relative to dataset_root
-    newEngine = CreateEngine(dataset_root="./datasets/Z-Axis", 
+    dataset_root = r"C:\Users\jglatts\Documents\Z-Axis\YOLO-CV\datasets\Z-Axis"
+    newEngine = CreateEngine(dataset_root=dataset_root, 
                              category_name="z-fill",
                              normal_dir="zfill/train/good",
                              bad_dir="zfill/test/bad")
 
-    newEngine.createEngineSimple(normal_dir="good", bad_dir="bad")
+    newEngine.createEngineSimple()
