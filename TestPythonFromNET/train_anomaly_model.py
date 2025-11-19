@@ -59,10 +59,37 @@ class CreateEngine:
     def testEngine(self):
         if not self.is_created:
             return
-        
-        print("\n\n🚀 Starting Testing... 🚀\n\n")
-        self.engine.test(datamodule=self.datamodule, model=self.model)
-        print("\n\n🚀 Testing Complete... 🚀\n\n")
+
+        print("\n\n🚀 Starting Testing... 🚀\n")
+
+        # Run test and capture metrics
+        results_list = self.engine.test(datamodule=self.datamodule, model=self.model)
+
+        print("\n📊 Test Metrics Explained:\n")
+
+        # Define padding width
+        label_width = 20
+
+        print(f"{'Metric'.ljust(label_width)} : {'Value'.ljust(10)} : Explanation")
+        print("-" * 80)
+
+        # Loop over results (list of dicts)
+        for i, results in enumerate(results_list):
+            auroc = results.get("image_AUROC", None)
+            f1 = results.get("image_F1Score", None)
+
+            print(f"[DataLoader {i}]")
+            print(f"{'Image AUROC'.ljust(label_width)} : {auroc:<10.4f} : "
+                  "AUROC (Area Under the ROC Curve) measures the model's ability "
+                  "to distinguish between normal and anomalous images. "
+                  "1.0 = perfect separation, 0.5 = random guessing.")
+            print(f"{'Image F1 Score'.ljust(label_width)} : {f1:<10.4f} : "
+                  "F1 Score is the harmonic mean of precision and recall for detecting anomalies "
+                  "at the image level. Higher is better (good balance between detecting anomalies and avoiding false alarms).")
+            print("-" * 80)
+
+        print("\n🚀 Testing Complete... 🚀\n")
+
 
     def createEngineSimple(self):
         self.datamodule = Folder(
