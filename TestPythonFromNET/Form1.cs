@@ -31,6 +31,7 @@ namespace TestPythonFromNET
         private Process pyProcess;
         private int FrameCount = 0;
         private long numPyFrames = 1;
+        private string pyScriptPath = "infer_anomalib.py";
 
         public Form1()
         {
@@ -115,6 +116,8 @@ namespace TestPythonFromNET
             if (!CheckFrameCount())
                 return;
 
+            // write frame to temp file
+            // python process reads from stdin the path to the image file
             string tempPath = Path.Combine(Path.GetTempPath(), "frame.jpg");
             frame.Save(tempPath);
             try
@@ -196,7 +199,7 @@ namespace TestPythonFromNET
             return new ProcessStartInfo
             {
                 FileName = "python",
-                Arguments = "infer_anomalib_2.py",
+                Arguments = pyScriptPath,
                 UseShellExecute = false,
                 RedirectStandardInput = true,
                 RedirectStandardOutput = true,

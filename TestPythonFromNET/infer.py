@@ -17,7 +17,7 @@ import numpy as np
 
 
 DEBUG = False
-
+ran_from_stdin = False
 
 def encode_image(img):
     _, buffer = cv2.imencode(".jpg", img)

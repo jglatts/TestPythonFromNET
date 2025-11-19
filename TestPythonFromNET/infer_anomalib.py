@@ -24,6 +24,10 @@ MIN_RADIUS = 3
 model = Patchcore()
 engine = Engine()
 
+CKPT_PATH = "model.ckpt"
+
+ran_from_shell = False
+
 def encode_image(img):
     _, buffer = cv2.imencode(".jpg", img)
     return base64.b64encode(buffer).decode("utf-8")
@@ -67,7 +71,7 @@ def predict_frame(frame):
     
     dataset = PredictDataset(path=temp_file.name, image_size=(512, 512))
     predictions = engine.predict(model=model, dataset=dataset, 
-                                 ckpt_path=CKPT_PATH, return_predictions=False)
+                                 ckpt_path=CKPT_PATH)
     
     temp_file.close()
     
@@ -84,12 +88,16 @@ def process_image_path(path):
         status, score, overlay = analyze_prediction(preds[0], frame)
     else:
         status, score, overlay = "GOOD", 0, frame
-
-    return {
+    
+    out = {
         "status": status,
         "score": score,
-        "overlay": encode_image(overlay)
     }
+
+    if not ran_from_shell:
+        out["overlay"] = encode_image(overlay)
+    
+    return out
 
 
 def main():
