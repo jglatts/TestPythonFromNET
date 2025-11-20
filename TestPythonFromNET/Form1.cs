@@ -41,11 +41,11 @@ namespace TestPythonFromNET
             StartPythonProcess();
             InitCamera();
             this.FormClosing += Form1_FormClosing;
+            this.Shown += SetPyFeedBox;
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            // Stop your Python process if it's running
             if (pyProcess != null && !pyProcess.HasExited)
             {
                 try
@@ -84,6 +84,35 @@ namespace TestPythonFromNET
                 old?.Dispose();
             }));
         }
+
+        private void SetPyFeedBox(object s, EventArgs e)
+        {
+            mainFeedPixBox.Invoke(new Action(() =>
+            {
+                Image old = mainFeedPixBox.Image;
+                mainFeedPixBox.Image = null;
+                old?.Dispose();
+
+                string text = "Python Process Loading";
+                Bitmap bmp = new Bitmap(mainFeedPixBox.Width, mainFeedPixBox.Height);
+                using (Graphics g = Graphics.FromImage(bmp))
+                {
+                    g.Clear(Color.Black);
+                    using (Font font = new Font("Arial", 16, FontStyle.Bold))
+                    using (Brush brush = new SolidBrush(Color.White))
+                    {
+                        SizeF textSize = g.MeasureString(text, font);
+                        PointF location = new PointF(
+                            (bmp.Width - textSize.Width) / 2,
+                            (bmp.Height - textSize.Height) / 2);
+                        g.DrawString(text, font, brush, location);
+                    }
+                }
+
+                mainFeedPixBox.Image = bmp;
+            }));
+        }
+
 
         private void LogErrorText(string txt)
         {
