@@ -29,6 +29,8 @@ class SimpleBatch:
 
 class Detector:
     def __init__(self):
+        # need to tweak model.ckpt path as needed
+        # train it somemore
         self.CKPT_PATH = "model.ckpt"
         self.IMAGE_SCORE_THRESHOLD = 50
         self.MIN_RADIUS = 3
