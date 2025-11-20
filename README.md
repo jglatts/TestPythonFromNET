@@ -17,7 +17,7 @@
 
 - **.NET Framework** (or .NET Core / .NET 6+)
 - **Python 3.x** installed and added to PATH
-- Optional: [AForge.NET](http://www.aforgenet.com/) for camera/video functionality
+- Optional: [AForge.NET](https://github.com/andrewkirillov/AForge.NET) for camera/video functionality
 
 ---
 
