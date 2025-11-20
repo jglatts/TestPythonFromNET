@@ -31,7 +31,9 @@ namespace TestPythonFromNET
         private Process pyProcess;
         private int FrameCount = 0;
         private long numPyFrames = 1;
-        private string pyScriptPath = "infer_anomalib.py";
+        //private string pyScriptPath = "infer_anomalib.py";
+        // script below doenst write-to-disk, but needs more testing 
+        private string pyScriptPath = "infer_anomalib_2.py";
 
         public Form1()
         {
@@ -117,11 +119,11 @@ namespace TestPythonFromNET
                 return;
 
             // write frame to temp file
-            // python process reads from stdin the path to the image file
             string tempPath = Path.Combine(Path.GetTempPath(), "frame.jpg");
             frame.Save(tempPath);
             try
             {
+                // write the file name to python stdin
                 if (pyProcess != null && !pyProcess.HasExited)
                 {
                     pyProcess.StandardInput.WriteLine(tempPath);
@@ -151,10 +153,8 @@ namespace TestPythonFromNET
         private Rectangle GetCropRect(Bitmap frame, PictureBox box)
         {
             int cropWidth, cropHeight, x , y;
-            
             float boxAspect = (float)box.Width / box.Height;
             float frameAspect = (float)frame.Width / frame.Height;
-
             if (frameAspect > boxAspect)
             {
                 cropHeight = frame.Height;
@@ -177,13 +177,14 @@ namespace TestPythonFromNET
             return src.Clone(cropArea, src.PixelFormat);
         }
 
+        // Callback method to handle data received from Python process
         private void ImageFromPythonCallback(DataReceivedEventArgs e)
         {
             var result = JsonSerializer.Deserialize<PythonResult>(e.Data);
             if (result != null && result.overlay != null)
             {
                 byte[] bytes = Convert.FromBase64String(result.overlay);
-                using var ms = new MemoryStream(bytes);
+                using MemoryStream ms = new MemoryStream(bytes);
                 Bitmap bmp = new Bitmap(ms);
                 mainFeedPixBox.Invoke(() =>
                 {

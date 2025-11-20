@@ -1,12 +1,14 @@
 """
-anomalib_infer.py
+    anomalib_infer.py
 
-Minimal Python script to integrate Anomalib Patchcore with a C# frontend.
+    Minimal Python script to integrate Anomalib Patchcore with a C# frontend.
 
+    - Reads image paths from stdin.
+    - Runs Patchcore anomaly detection.
+    - Returns JSON with status, score, and overlay image (base64).
 
-- Reads image paths from stdin.
-- Runs Patchcore anomaly detection.
-- Returns JSON with status, score, and overlay image (base64).
+    Works well with C# frontend
+    Writes to disk which is bad for mem\performance 
 """
 import sys
 import json
@@ -27,6 +29,7 @@ engine = Engine()
 CKPT_PATH = "model.ckpt"
 
 ran_from_shell = False
+
 
 def encode_image(img):
     _, buffer = cv2.imencode(".jpg", img)
